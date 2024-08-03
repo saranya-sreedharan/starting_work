@@ -1,0 +1,56 @@
+FROM php:8.1
+
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git \
+        unzip \
+        libpq-dev \
+        libzip-dev \
+        # Install MySQLi extension
+        && docker-php-ext-install mysqli \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Install PDO extension for MySQL
+RUN docker-php-ext-install pdo pdo_mysql
+
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+
+# Install Ratchet library for WebSocket support
+RUN composer require cboden/ratchet
+
+
+
+
+# Set the working directory in the container
+WORKDIR /var/www/html
+
+
+# Copy the composer.json and composer.lock files
+COPY src/composer.json src/composer.lock ./
+
+
+# Install Composer dependencies
+RUN composer install --no-scripts --no-autoloader
+
+
+# Copy the rest of the application code
+COPY src ./
+
+
+# Generate the autoloader
+RUN composer dump-autoload --optimize
+
+
+# Expose ports 80 and 8080 for HTTP and WebSocket respectively
+EXPOSE 80
+EXPOSE 8080
+
+
+# Command to run on container start
+CMD php -S 0.0.0.0:80 & php bin/chat-server.php

@@ -1,0 +1,116 @@
+
+
+
+username = 'usr_local_invoiceflow'
+password = 'b5^^9o-gS6*n'
+hostname = 'mnserviceproviders.com'
+database = 'local_db_developer_mm_invoiceflow'
+port = '3307'
+
+
+
+sudo apt update
+
+sudo apt install docker.io -y
+
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+docker-compose --version
+
+sudo nano docker-compose.yml
+
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb_container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: maindb
+      MYSQL_USER: dockerroot
+      MYSQL_PASSWORD: docker&root@123^
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
+
+
+sudo docker-compose up -d
+
+wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.13.0/mysqld_exporter-0.13.0.linux-amd64.tar.gz
+
+tar xvfz mysqld_exporter-0.13.0.linux-amd64.tar.gz
+
+sudo mv mysqld_exporter-0.13.0.linux-amd64/mysqld_exporter /usr/local/bin
+
+sudo docker ps
+
+ip adress =sudo docker inspect 218a2b99b80c | grep IPAddress
+
+
+Create a Configuration File:
+
+ubuntu@ip-172-31-94-75:~$ cat mysqld_exporter.yml
+[client]
+  user: 'dockerroot'
+  pass: 'docker&root@123^'
+  endpoint: '172.18.0.2:3306'
+
+
+http:3.82.141.56:9104/metrics
+
+curl http://3.82.141.56:9104/metrics
+
+
+
+sudo docker run -d \
+  -p 9104:9104 \
+  -v /home/ubuntu/mysqld_exporter.yml:/etc/mysqld_exporter.yml \
+  prom/mysqld-exporter \
+  --config.my-cnf=/etc/mysqld_exporter.yml
+
+
+
+
+
+sudo docker inspect 2eb61c72f6ca | grep IPAddress
+
+
+
+
+
+
+
+
+sudo docker run -d \
+  -p 9104:9104 \
+  -v /home/ubuntu/mysqld_exporter.yml:/etc/mysqld_exporter.yml \
+  prom/mysqld-exporter \
+  --config.my-cnf=/etc/mysqld_exporter.yml
+
+echo 'prometheus machine.'
+sudo nano /etc/prometheus/prometheus.yml
+
+scrape_configs:
+  - job_name: 'mariadb'
+    static_configs:
+      - targets: ['3.82.141.56:9104']
+
+
+sudo systemctl restart prometheus
+
+
+
+mysql -h 172.18.0.2 -u dockerroot -p
+
+
+
+
+
+

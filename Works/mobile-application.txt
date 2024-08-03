@@ -1,0 +1,41 @@
+
+
+scp -i C:\Users\HP\Downloads\ec2_pemkey.pem.pem -r C:\Users\HP\Downloads\'SecondApp -V11'\ ubuntu@3.88.33.237:/home/ubuntu/
+
+
+
+ssh -i C:\Users\HP\Downloads\ec2_pemkey.pem.pem ubuntu@3.88.33.237 'ls /home/ubuntu'
+
+:\Users\HP>scp -i "C:\Users\HP\Downloads\ec2_pemkey.pem.pem" -r "C:\Users\HP\Downloads\SecondApp -V11\" ubuntu@3.88.33.237:/home/ubuntu/
+
+
+scp -i C:\Users\HP\Downloads\ec2_pemkey.pem.pem -r "C:\Users\HP\Downloads\SecondApp -V11\" ubuntu@3.88.33.237:/home/ubuntu/
+
+scp -i C:\Users\HP\Downloads\ec2_pemkey.pem.pem -r 'C:\Users\HP\Downloads\SecondApp -V11\' ubuntu@3.88.33.237:/home/ubuntu/
+
+
+
+scp -i "C:\Users\HP\Downloads\ec2_pemkey.pem.pem" -r "SecondApp-V11" ubuntu@3.88.33.237:/home/ubuntu/
+
+
+# Stage 1: Build the React Native app
+FROM node:14-alpine as build
+# Set working directory
+WORKDIR /app
+# Copy the rest of the application
+COPY SecondApp/ ./
+# Install dependencies
+RUN npm install --silent
+# Build the application
+RUN npm run build
+
+# Stage 2: Serve the built app using Nginx
+FROM nginx:alpine
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
+# Copy built app from previous stage
+COPY --from=build /app/SecondApp/build /usr/share/nginx/html
+# Expose port 80 to the outside world
+EXPOSE 80
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]

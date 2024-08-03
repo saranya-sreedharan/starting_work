@@ -1,0 +1,62 @@
+ubuntu@ip-172-31-92-238:~/Feedback$ ls
+Dockerfile  src
+
+
+ubuntu@ip-172-31-92-238:~/Feedback$ cd src
+
+ubuntu@ip-172-31-92-238:~/Feedback/src$ ls
+
+application  composer.json  composer.lock  contributing.md  feedbackQueries.sql  feedback_readme.txt  index.php  license.txt  readme.rst  system
+
+ubuntu@ip-172-31-92-238:~/Feedback/src$ ll
+total 140
+drwxrwxr-x  4 ubuntu ubuntu  4096 Feb 19 13:31 ./
+drwxrwxr-x  4 ubuntu ubuntu  4096 Feb 19 13:47 ../
+-rw-r--r--  1 root   root     210 Feb 19 13:31 .env
+drwxrwxr-x 14 ubuntu ubuntu  4096 Feb 19 13:30 application/
+-rw-rw-r--  1 ubuntu ubuntu  1056 Feb 19 10:02 composer.json
+-rw-rw-r--  1 ubuntu ubuntu 81685 Feb 19 10:02 composer.lock
+-rw-rw-r--  1 ubuntu ubuntu  6841 Feb 19 10:02 contributing.md
+-rw-rw-r--  1 ubuntu ubuntu  1098 Feb 19 10:02 feedbackQueries.sql
+-rw-rw-r--  1 ubuntu ubuntu   959 Feb 19 10:02 feedback_readme.txt
+-rw-rw-r--  1 ubuntu ubuntu 10373 Feb 19 10:02 index.php
+-rw-rw-r--  1 ubuntu ubuntu  1097 Feb 19 10:02 license.txt
+-rw-rw-r--  1 ubuntu ubuntu  2438 Feb 19 10:02 readme.rst
+drwxrwxr-x  4 ubuntu ubuntu  4096 Feb 19 10:04 system/
+ubuntu@ip-172-31-92-238:~/Feedback/src$ 
+
+Note : apllication...../routes.php add $route['test']='feedbackcontroller/test'
+
+
+ubuntu@ip-172-31-92-238:~/Feedback$ sudo cat Dockerfile 
+# Use the official PHP image as a base image
+FROM php:8.1
+
+# Install Composer and other dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git \
+        unzip \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Set the working directory in the container
+WORKDIR /var/www/html
+
+# Copy the composer.json and composer.lock files
+COPY src/composer.json src/composer.lock ./
+
+# Install Composer dependencies
+RUN composer install --no-scripts --no-autoloader
+
+# Copy the rest of the application code
+COPY src ./
+
+# Generate the autoloader
+RUN composer dump-autoload --optimize
+
+# Expose port 80 to the outside world
+EXPOSE 80
+
+# Command to run on container start
+CMD ["php", "-S", "0.0.0.0:80"]
